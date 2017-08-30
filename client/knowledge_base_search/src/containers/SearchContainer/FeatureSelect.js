@@ -34,9 +34,14 @@ class FeatureSelect extends Component {
           { questionTypeSelector }
         </li>
         {
-          Object.values(FeatureSelect.featureTypes).map((feature) => {
+          Object.keys(FeatureSelect.featureTypes).map((featureKey) => {
+            const feature = FeatureSelect.featureTypes[featureKey];
+
             return (
-              <li key={feature.value} className="feature_select--list_item">
+              <li
+                key={feature.value}
+                className="feature_select--list_item"
+              >
                 <button
                   type="button"
                   value={feature.value}

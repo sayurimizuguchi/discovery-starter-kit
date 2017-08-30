@@ -26,7 +26,9 @@ class QuestionTypeSelect extends Component {
         onChange={this.props.onSelect}
       >
         {
-          Object.values(QuestionTypeSelect.questionTypes).map((question) => {
+          Object.keys(QuestionTypeSelect.questionTypes).map((questionKey) => {
+            const question = QuestionTypeSelect.questionTypes[questionKey];
+
             return (
               <option key={question.value} value={question.value}>
                 { question.text }
