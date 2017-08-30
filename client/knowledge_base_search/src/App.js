@@ -3,6 +3,7 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 import Sticky from 'react-stickynode';
 import { Header, Jumbotron, Footer, Icon } from 'watson-react-components';
 import SearchContainer from './containers/SearchContainer/SearchContainer';
+import FeatureSelect from './containers/SearchContainer/FeatureSelect';
 import QuestionBarContainer from './containers/QuestionBarContainer/QuestionBarContainer';
 import PassagesContainer from './containers/PassagesContainer/PassagesContainer';
 import ErrorContainer from './containers/ErrorContainer/ErrorContainer';
@@ -26,12 +27,13 @@ class App extends Component {
       searchContainerHeight: 0,
       showViewAll: false,
       presetQueries: [],
-      offset: 0
+      offset: 0,
+      selectedFeature: FeatureSelect.featureTypes.PASSAGES.value
     }
   }
 
   componentDidMount() {
-    questions().then((response) => {
+    questions(this.state.selectedFeature).then((response) => {
       if (response.error) {
         this.setState({
           questionsError: response.error,
@@ -139,7 +141,9 @@ class App extends Component {
 
   handleQuestionClick = (query) => {
     const { presetQueries, offset } = this.state;
-    const questionIndex = presetQueries.indexOf(query);
+    const questionIndex = presetQueries.findIndex((presetQuery) => {
+      return presetQuery.question === query;
+    });
     const beginQuestions = offset;
     const endQuestions = offset + QuestionBarContainer.defaultProps.questionsShown - 1;
     let newPresetQueries = presetQueries.slice(0);
@@ -147,7 +151,7 @@ class App extends Component {
 
     if (questionIndex < beginQuestions || questionIndex > endQuestions) {
       newPresetQueries.splice(questionIndex, 1);
-      newPresetQueries.unshift(query);
+      newPresetQueries.unshift({question: query});
       newOffset = 0;
     }
 
@@ -158,6 +162,24 @@ class App extends Component {
       offset: newOffset
     })
     this.handleSearch(query);
+  }
+
+  handleQuestionFetch = (e) => {
+    const selectedFeature = e.target.value;
+    questions(selectedFeature).then((response) => {
+      if (response.error) {
+        this.setState({
+          questionsError: response.error,
+          fetchingQuestions: false
+        });
+      } else {
+        this.setState({
+          presetQueries: this.shuffleQuestions(response),
+          fetchingQuestions: false,
+          selectedFeature
+        });
+      }
+    });
   }
 
   handleOffsetUpdate = (offset) => {
@@ -193,12 +215,14 @@ class App extends Component {
             isFetchingQuestions={this.state.fetchingQuestions}
             isFetchingResults={this.state.fetchingResults}
             offset={this.state.offset}
+            onFeatureSelect={this.handleQuestionFetch}
             onOffsetUpdate={this.handleOffsetUpdate}
             onQuestionClick={this.handleQuestionClick}
             onSubmit={this.handleSearch}
             onViewAllClick={this.toggleViewAll}
             presetQueries={this.state.presetQueries}
             searchInput={this.state.search_input}
+            selectedFeature={this.state.selectedFeature}
           />
         </Sticky>
         <CSSTransitionGroup

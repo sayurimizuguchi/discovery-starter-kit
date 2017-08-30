@@ -79,7 +79,8 @@ try:
 except ValueError:
     sys.exit('DISCOVERY_QUESTION_COUNT not an integer, terminating...')
 
-question_cache = get_questions(discovery, constants, total_questions)
+passages_question_cache = get_questions(discovery, constants, total_questions, 'passages')
+relevancy_question_cache = get_questions(discovery, constants, total_questions, 'relevancy')
 
 
 @app.route('/')
@@ -107,9 +108,12 @@ def query(collection_type):
             )
 
 
-@app.route('/api/questions', methods=['GET'])
-def questions():
-    return jsonify(question_cache)
+@app.route('/api/questions/<question_type>', methods=['GET'])
+def questions(question_type):
+    if question_type == 'passages':
+        return jsonify(passages_question_cache)
+    else:
+        return jsonify(relevancy_question_cache)
 
 
 @app.errorhandler(429)

@@ -1,8 +1,8 @@
 import 'whatwg-fetch';
 
-const questions = () => {
+const questions = (question_type) => {
   const host = process.env.REACT_APP_SERVER || '';
-  return fetch(`${host}/api/questions`, {
+  return fetch(`${host}/api/questions/${question_type}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' }
   })

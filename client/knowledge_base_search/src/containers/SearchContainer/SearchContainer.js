@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import { string, number, bool, func, arrayOf, shape } from 'prop-types';
 import { Icon, TextInput } from 'watson-react-components';
 import ErrorContainer from '../ErrorContainer/ErrorContainer';
 import QuestionBarContainer from '../QuestionBarContainer/QuestionBarContainer';
@@ -12,8 +12,7 @@ class SearchContainer extends Component {
     super(props);
     this.state = {
       searchInput: '',
-      selectedQuestionType: QuestionTypeSelect.questionTypes.PRESET.value,
-      selectedFeature: FeatureSelect.featureTypes.PASSAGES.value
+      selectedQuestionType: QuestionTypeSelect.questionTypes.PRESET.value
     };
   }
 
@@ -48,10 +47,6 @@ class SearchContainer extends Component {
 
   handleOnQuestionTypeSelect = (e) => {
     this.setState({ selectedQuestionType: e.target.value });
-  }
-
-  handleOnFeatureSelect = (e) => {
-    this.setState({ selectedFeature: e.target.value });
   }
 
   renderQuestionType() {
@@ -142,8 +137,8 @@ class SearchContainer extends Component {
         <div className='_container _container_large'>
           <form onSubmit={this.handleOnSubmit}>
             <FeatureSelect
-              onFeatureSelect={this.handleOnFeatureSelect}
-              selectedFeature={this.state.selectedFeature}
+              onFeatureSelect={this.props.onFeatureSelect}
+              selectedFeature={this.props.selectedFeature}
               questionTypeSelector={
                 <QuestionTypeSelect
                   onSelect={this.handleOnQuestionTypeSelect}
@@ -160,16 +155,20 @@ class SearchContainer extends Component {
 }
 
 SearchContainer.PropTypes = {
-  errorMessage: PropTypes.string,
-  isFetchingQuestions: PropTypes.bool.isRequired,
-  isFetchingResults: PropTypes.bool.isRequired,
-  offset: PropTypes.number.isRequired,
-  onOffsetUpdate: PropTypes.func.isRequired,
-  onQuestionClick: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
-  onViewAllClick: PropTypes.func.isRequired,
-  presetQueries: PropTypes.arrayOf(PropTypes.string).isRequired,
-  searchInput: PropTypes.string.isRequired
+  errorMessage: string,
+  isFetchingQuestions: bool.isRequired,
+  isFetchingResults: bool.isRequired,
+  offset: number.isRequired,
+  onFeatureSelect: func.isRequired,
+  onOffsetUpdate: func.isRequired,
+  onQuestionClick: func.isRequired,
+  onSubmit: func.isRequired,
+  onViewAllClick: func.isRequired,
+  presetQueries: arrayOf(shape({
+    question: string.isRequired
+  })).isRequired,
+  searchInput: string.isRequired,
+  selectedFeature: string.isRequired
 }
 
 export default SearchContainer;
