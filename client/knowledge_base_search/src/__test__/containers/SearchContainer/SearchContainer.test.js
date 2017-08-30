@@ -1,9 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import SearchContainer from '../../../containers/SearchContainer/SearchContainer';
+import FeatureSelect from '../../../containers/SearchContainer/FeatureSelect';
+import QuestionTypeSelect from '../../../containers/SearchContainer/QuestionTypeSelect';
 import QuestionBarContainer from '../../../containers/QuestionBarContainer/QuestionBarContainer';
 import ErrorContainer from '../../../containers/ErrorContainer/ErrorContainer';
-import { TextInput, Icon } from 'watson-react-components';
+import { TextInput } from 'watson-react-components';
 import { shallow } from 'enzyme';
 
 describe('<SearchContainer />', () => {
@@ -109,9 +111,9 @@ describe('<SearchContainer />', () => {
         expect(wrapper.find('.view_all--button').props().disabled).toBe(true);
       });
 
-      describe('and the Custom Query tab is selected', () => {
+      describe('and "Custom questions" type is selected', () => {
         beforeEach(() => {
-          wrapper.find('.tab-panels--tab.base--a').at(1).simulate('click');
+          selectQuestionType(wrapper, QuestionTypeSelect.questionTypes.CUSTOM);
         });
 
         it('disables all the inputs', () => {
@@ -122,16 +124,40 @@ describe('<SearchContainer />', () => {
     });
   });
 
-  describe('when the Custom Query tab is pressed', () => {
+  describe('when "Custom questions" type is selected', () => {
     beforeEach(() => {
       wrapper = shallow(<SearchContainer {...props} />);
-      wrapper.find('.tab-panels--tab.base--a').at(1).simulate('click');
+      selectQuestionType(wrapper, QuestionTypeSelect.questionTypes.CUSTOM);
     });
 
     it('has the text search, icon, and submit button displayed', () => {
       expect(wrapper.find('.positioned--icon')).toHaveLength(1);
       expect(wrapper.find(TextInput)).toHaveLength(1);
       expect(wrapper.find('.white--button')).toHaveLength(1);
+    });
+  });
+
+  describe('when "Passages" feature is selected', () => {
+    beforeEach(() => {
+      wrapper = shallow(<SearchContainer {...props} />);
+      selectFeature(wrapper, FeatureSelect.featureTypes.PASSAGES);
+    });
+
+    it('sets the selectedFeature to "passages"', () => {
+      expect(wrapper.instance().state.selectedFeature)
+        .toEqual(FeatureSelect.featureTypes.PASSAGES.value);
+    });
+  });
+
+  describe('when "Relevancy" feature is selected', () => {
+    beforeEach(() => {
+      wrapper = shallow(<SearchContainer {...props} />);
+      selectFeature(wrapper, FeatureSelect.featureTypes.RELEVANCY);
+    });
+
+    it('sets the selectedFeature to "relevancy"', () => {
+      expect(wrapper.instance().state.selectedFeature)
+        .toEqual(FeatureSelect.featureTypes.RELEVANCY.value);
     });
   });
 
@@ -148,4 +174,20 @@ describe('<SearchContainer />', () => {
       expect(onSubmitMock).toBeCalledWith(text);
     });
   });
+
+  function selectQuestionType(wrapper, type) {
+    wrapper.instance().handleOnQuestionTypeSelect({
+      target: {
+        value: type.value
+      }
+    });
+  }
+
+  function selectFeature(wrapper, type) {
+    wrapper.instance().handleOnFeatureSelect({
+      target: {
+        value: type.value
+      }
+    });
+  }
 });
